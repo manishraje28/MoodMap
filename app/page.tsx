@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/immutability */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 import { useEffect, useState } from "react";
@@ -21,6 +23,8 @@ const Home = () => {
   const [mood, setMood] = useState<string>("");
 
   const [error, setError] = useState("");
+  const [places, setPlaces] = useState<any[]>([]);
+
 
   const fetchPlaces = async () => {
     if (!location || !mood) return;
@@ -48,7 +52,22 @@ const Home = () => {
       });
 
       const data = await res.json();
-      console.log(data.elements);
+      const placesWithDistance = data.elements.map((place: any) => ({
+        ...place,
+        distance: calculateDistance(
+          location.lat,
+          location.lng,
+          place.lat,
+          place.lon
+        ),
+      }));
+
+      placesWithDistance.sort(
+        (a: any, b: any) => a.distance - b.distance
+      );
+
+      setPlaces(placesWithDistance);
+
     } catch (error) {
       console.error("Error fetching places:", error);
     }
@@ -78,6 +97,30 @@ const Home = () => {
       }
     );
   }, []);
+
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+
+    const R = 6371; // Earth radius in KM
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // distance in KM
+  };
 
 
   return (
@@ -115,6 +158,21 @@ const Home = () => {
       </div>
 
       {mood && <p>Selected mood: {mood}</p>}
+
+      <h2>Nearby Places</h2>
+
+      {places.length === 0 && mood && <p>No places found</p>}
+
+      <ul>
+        {places.map((place) => (
+          <li key={place.id} style={{ marginBottom: "10px" }}>
+            <strong>{place.tags?.name || "Unnamed Place"}</strong>
+            <br />
+            📍 {place.distance.toFixed(2)} km away
+          </li>
+        ))}
+      </ul>
+
 
     </main>
   )
