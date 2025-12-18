@@ -18,21 +18,21 @@ export default function LocationStatus({
 }: LocationStatusProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-xl">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        <span>Getting your location...</span>
+      <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 text-sm">
+        <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={1.5} />
+        <span>Finding your location...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 rounded-xl">
-        <MapPin className="w-4 h-4 text-red-500" />
-        <span className="text-red-600 dark:text-red-400 text-sm">{error}</span>
+      <div className="flex items-center gap-2 text-sm">
+        <MapPin className="w-3.5 h-3.5 text-red-500" strokeWidth={1.5} />
+        <span className="text-red-600 dark:text-red-400">{error}</span>
         <button
           onClick={onRetry}
-          className="ml-2 text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
+          className="ml-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 underline underline-offset-2"
         >
           Retry
         </button>
@@ -42,10 +42,10 @@ export default function LocationStatus({
 
   if (location) {
     return (
-      <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-4 py-2 rounded-xl">
-        <MapPin className="w-4 h-4 text-emerald-500" />
-        <span className="text-emerald-600 dark:text-emerald-400 text-sm">
-          Location found: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+      <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
+        <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500" strokeWidth={1.5} />
+        <span>
+          {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
         </span>
       </div>
     );

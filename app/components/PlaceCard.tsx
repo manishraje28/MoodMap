@@ -2,7 +2,7 @@
 
 import { Place } from '../types';
 import { formatDistance, calculateBearing, getDirection } from '../utils/distance';
-import { MapPin, Clock, Phone, Globe, Navigation, Wifi, Coffee, Utensils, Star } from 'lucide-react';
+import { Clock, Phone, ExternalLink } from 'lucide-react';
 
 interface PlaceCardProps {
   place: Place;
@@ -32,18 +32,6 @@ export default function PlaceCard({
     ? getDirection(calculateBearing({ lat: userLat, lng: userLng }, { lat: place.lat, lng: place.lon }))
     : null;
 
-  const getAmenityIcon = () => {
-    switch (amenity) {
-      case 'cafe':
-        return <Coffee className="w-4 h-4" />;
-      case 'restaurant':
-      case 'fast_food':
-        return <Utensils className="w-4 h-4" />;
-      default:
-        return <MapPin className="w-4 h-4" />;
-    }
-  };
-
   const getAmenityLabel = () => {
     const labels: Record<string, string> = {
       cafe: 'Café',
@@ -58,109 +46,92 @@ export default function PlaceCard({
   };
 
   return (
-    <div
+    <article
       id={`place-${place.id}`}
       onClick={() => onSelect?.(place)}
       className={`
-        group relative bg-white dark:bg-gray-800 rounded-2xl p-5 
-        shadow-sm hover:shadow-xl dark:shadow-gray-900/50
-        border-2 transition-all duration-300 cursor-pointer
-        hover:-translate-y-1
-        ${isSelected
-          ? 'border-indigo-500 dark:border-indigo-400 ring-4 ring-indigo-500/20'
-          : 'border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600'
-        }
+        group py-4 border-b border-neutral-150 dark:border-neutral-800 cursor-pointer transition-colors
+        ${isSelected ? 'bg-neutral-100 dark:bg-neutral-800/50 -mx-4 px-4' : 'hover:bg-neutral-50 dark:hover:bg-neutral-900 -mx-4 px-4'}
       `}
     >
-      {/* Score Badge */}
-      {place.score !== undefined && place.score >= 80 && (
-        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
-          <Star className="w-3 h-3 fill-current" />
-          Top Pick
-        </div>
-      )}
-
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          {/* Name */}
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-            {name}
-          </h3>
-
-          {/* Amenity & Cuisine */}
-          <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-              {getAmenityIcon()}
+          {/* Name and type */}
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <h3 className="font-medium text-neutral-900 dark:text-neutral-100 group-hover:underline underline-offset-2">
+              {name}
+            </h3>
+            <span className="text-xs text-neutral-400 dark:text-neutral-500 uppercase tracking-wide">
               {getAmenityLabel()}
             </span>
-            {cuisine && (
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                • {cuisine.split(';')[0]}
-              </span>
-            )}
           </div>
 
-          {/* Features */}
-          <div className="flex flex-wrap gap-2 mt-3">
+          {/* Details row */}
+          <div className="mt-1.5 flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+            {/* Distance */}
+            <span className="font-medium text-neutral-700 dark:text-neutral-300">
+              {formatDistance(place.distance)}
+              {direction && <span className="ml-1 font-normal">{direction}</span>}
+            </span>
+
+            {/* Cuisine */}
+            {cuisine && (
+              <>
+                <span className="text-neutral-300 dark:text-neutral-600">·</span>
+                <span>{cuisine.split(';')[0]}</span>
+              </>
+            )}
+
+            {/* Features - subtle */}
             {hasWifi && (
-              <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-full">
-                <Wifi className="w-3 h-3" />
-                WiFi
-              </span>
+              <>
+                <span className="text-neutral-300 dark:text-neutral-600">·</span>
+                <span>WiFi</span>
+              </>
             )}
             {hasOutdoorSeating && (
-              <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-full">
-                ☀️ Outdoor
-              </span>
-            )}
-            {openingHours && (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
-                <Clock className="w-3 h-3" />
-                {openingHours.length > 20 ? 'Hours available' : openingHours}
-              </span>
+              <>
+                <span className="text-neutral-300 dark:text-neutral-600">·</span>
+                <span>Outdoor</span>
+              </>
             )}
           </div>
 
-          {/* Contact Links */}
-          <div className="flex items-center gap-3 mt-3">
-            {phone && (
-              <a
-                href={`tel:${phone}`}
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                <Phone className="w-3 h-3" />
-                Call
-              </a>
-            )}
-            {website && (
-              <a
-                href={website.startsWith('http') ? website : `https://${website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                <Globe className="w-3 h-3" />
-                Website
-              </a>
-            )}
-          </div>
+          {/* Hours if available */}
+          {openingHours && (
+            <p className="mt-1.5 text-xs text-neutral-400 dark:text-neutral-500 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {openingHours.length > 30 ? 'Hours available' : openingHours}
+            </p>
+          )}
         </div>
 
-        {/* Distance */}
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <div className="flex items-center gap-1 text-lg font-bold text-indigo-600 dark:text-indigo-400">
-            <Navigation className="w-4 h-4" />
-            {formatDistance(place.distance)}
-          </div>
-          {direction && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {direction}
-            </span>
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          {phone && (
+            <a
+              href={`tel:${phone}`}
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              title="Call"
+            >
+              <Phone className="w-4 h-4" strokeWidth={1.5} />
+            </a>
+          )}
+          {website && (
+            <a
+              href={website.startsWith('http') ? website : `https://${website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              title="Website"
+            >
+              <ExternalLink className="w-4 h-4" strokeWidth={1.5} />
+            </a>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

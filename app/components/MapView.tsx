@@ -149,17 +149,14 @@ export default function MapView({
   // Show error state if location is invalid
   if (!hasValidLocation) {
     return (
-      <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <div className="text-center text-gray-500 dark:text-gray-400">
-          <p>Waiting for location...</p>
-          <p className="text-sm">Please allow location access</p>
-        </div>
+      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+        <p className="text-sm text-neutral-400 dark:text-neutral-500">Waiting for location...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
+    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700">
       <MapContainer
         center={[centerLat, centerLng]}
         zoom={initialZoom}
@@ -226,11 +223,9 @@ export default function MapView({
               }}
             >
               <Popup>
-                <div className="min-w-[150px]">
-                  <strong className="block mb-1">{place.tags?.name || 'Unnamed Place'}</strong>
-                  <span className="text-sm text-gray-600">
-                    {formatDistance(place.distance)} away
-                  </span>
+                <div className="text-sm">
+                  <strong className="block">{place.tags?.name || 'Unnamed Place'}</strong>
+                  <span className="text-neutral-500">{formatDistance(place.distance)}</span>
                 </div>
               </Popup>
             </Marker>
@@ -238,20 +233,10 @@ export default function MapView({
         })}
       </MapContainer>
       
-      {/* Map legend */}
-      <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 text-xs z-[1000]">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-3 h-3 rounded-full bg-blue-500" />
-          <span className="text-gray-600 dark:text-gray-400">Your location</span>
-        </div>
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-3 h-3 rounded-full bg-violet-500" />
-          <span className="text-gray-600 dark:text-gray-400">Places</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500" />
-          <span className="text-gray-600 dark:text-gray-400">Selected</span>
-        </div>
+      {/* Map legend - minimal */}
+      <div className="absolute bottom-3 left-3 bg-white/90 dark:bg-neutral-900/90 rounded px-2 py-1.5 text-[10px] text-neutral-500 dark:text-neutral-400 z-[1000] flex items-center gap-3">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> You</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-violet-500"></span> Places</span>
       </div>
     </div>
   );

@@ -25,8 +25,8 @@ function isValidLocation(location: Location | null | undefined): location is Loc
 const MapView = dynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] md:h-[500px] rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse flex items-center justify-center">
-      <div className="text-gray-400 dark:text-gray-500">Loading map...</div>
+    <div className="w-full aspect-[4/3] rounded-lg bg-neutral-100 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
+      <span className="text-sm text-neutral-400 dark:text-neutral-500">Loading map...</span>
     </div>
   ),
 });
@@ -43,8 +43,8 @@ export default function MapWrapper(props: MapWrapperProps) {
   // Don't render map if location is invalid
   if (!isValidLocation(props.userLocation)) {
     return (
-      <div className="w-full h-[400px] md:h-[500px] rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <div className="text-gray-400 dark:text-gray-500">Waiting for valid location...</div>
+      <div className="w-full aspect-[4/3] rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+        <span className="text-sm text-neutral-400 dark:text-neutral-500">Waiting for location...</span>
       </div>
     );
   }

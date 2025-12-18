@@ -1,45 +1,44 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from './providers/ThemeProvider';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+
+const sourceSerif = Source_Serif_4({ 
+  subsets: ['latin'],
+  variable: '--font-serif',
+  weight: ['400', '600'],
+});
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
     { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
 };
 
 export const metadata: Metadata = {
-  title: 'PlaceSense - Discover Places That Match Your Mood',
-  description:
-    'Find the perfect nearby spot based on how you feel. Whether you need a quiet cafe to work, a romantic restaurant for a date, or a quick bite on the go.',
-  keywords: [
-    'nearby places',
-    'mood-based recommendations',
-    'cafes',
-    'restaurants',
-    'location finder',
-    'OpenStreetMap',
-  ],
-  authors: [{ name: 'PlaceSense Team' }],
+  title: 'MoodMap — Find places that fit how you feel',
+  description: 'Discover nearby spots based on your mood. Simple, private, and free.',
+  keywords: ['nearby places', 'mood', 'cafes', 'restaurants', 'local', 'OpenStreetMap'],
+  authors: [{ name: 'MoodMap' }],
   openGraph: {
-    title: 'PlaceSense - Discover Places That Match Your Mood',
-    description:
-      'Find the perfect nearby spot based on how you feel. Built with Next.js and OpenStreetMap.',
+    title: 'MoodMap — Find places that fit how you feel',
+    description: 'Discover nearby spots based on your mood. Simple, private, and free.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'PlaceSense',
+    siteName: 'MoodMap',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PlaceSense - Discover Places That Match Your Mood',
-    description:
-      'Find the perfect nearby spot based on how you feel. Built with Next.js and OpenStreetMap.',
+    title: 'MoodMap — Find places that fit how you feel',
+    description: 'Discover nearby spots based on your mood. Simple, private, and free.',
   },
   robots: {
     index: true,
@@ -53,10 +52,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${sourceSerif.variable}`}>
+      <body className="font-sans antialiased">
         <ThemeProvider>
-          <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+          <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
             {children}
           </div>
         </ThemeProvider>
