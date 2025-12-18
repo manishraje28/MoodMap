@@ -3,55 +3,72 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 import { useEffect, useState } from "react";
+import PlaceCard from "./components/PlaceCard";
 
 const Home = () => {
 
 
-  const moodToTags: Record<string, string[]> = {
-    work: ["cafe", "library"],
-    date: ["restaurant", "park"],
-    quick: ["fast_food"],
-    budget: ["food"],
-  };
+ const moodToTags: Record<string, string[]> = {
+  work: ["cafe"],
+  date: ["restaurant"],
+  quick: ["fast_food"],
+  budget: ["restaurant"],
+};
+
 
   type Location = {
     lat: number;
     lng: number;
   };
+  const [loading, setLoading] = useState(false);
 
   const [location, setLocation] = useState<Location | null>(null);
   const [mood, setMood] = useState<string>("");
+  const [sortBy, setSortBy] = useState("distance");
 
   const [error, setError] = useState("");
   const [places, setPlaces] = useState<any[]>([]);
 
 
   const fetchPlaces = async () => {
+    console.log("Find Places clicked");
+console.log("fetchPlaces called");
+  console.log("Location:", location);
+  console.log("Mood:", mood);
     if (!location || !mood) return;
+
+    setLoading(true);
 
     const tags = moodToTags[mood];
 
     const query = `
-    [out:json];
-    (
-      ${tags
-        .map(
-          (tag) => `
-        node["amenity"="${tag}"](around:2000,${location.lat},${location.lng});
-      `
-        )
-        .join("")}
-    );
-    out;
-  `;
+[out:json][timeout:20];
+(
+  node["amenity"="${tags[0]}"](around:2000,${location.lat},${location.lng});
+);
+out tags center 20;
+`;
+
 
     try {
-      const res = await fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        body: query,
-      });
+      const res = await fetch(
+        "https://overpass.kumi.systems/api/interpreter",
+        {
+          method: "POST",
+          body: query,
+        }
+      );
 
-      const data = await res.json();
+      const text = await res.text();
+
+      if (!res.ok) {
+        console.error(text);
+        return;
+      }
+
+      const data = JSON.parse(text);
+console.log("Overpass raw elements:", data.elements);
+
       const placesWithDistance = data.elements.map((place: any) => ({
         ...place,
         distance: calculateDistance(
@@ -62,21 +79,21 @@ const Home = () => {
         ),
       }));
 
-      placesWithDistance.sort(
-        (a: any, b: any) => a.distance - b.distance
-      );
-
       setPlaces(placesWithDistance);
-
-    } catch (error) {
-      console.error("Error fetching places:", error);
+    } catch (err) {
+      console.error("Fetch failed", err);
+    } finally {
+      setLoading(false);
     }
+    
   };
-  useEffect(() => {
-    if (mood && location) {
-      fetchPlaces();
-    }
-  }, [mood]);
+
+
+  // useEffect(() => {
+  //   if (mood && location) {
+  //     fetchPlaces();
+  //   }
+  // }, [mood]);
 
 
   useEffect(() => {
@@ -121,6 +138,12 @@ const Home = () => {
 
     return R * c; // distance in KM
   };
+  // const sortedPlaces = [...places].sort((a, b) => {
+  //   if (sortBy === "name") {
+  //     return (a.tags?.name || "").localeCompare(b.tags?.name || "");
+  //   }
+  //   return a.distance - b.distance;
+  // });
 
 
   return (
@@ -163,15 +186,29 @@ const Home = () => {
 
       {places.length === 0 && mood && <p>No places found</p>}
 
-      <ul>
+      <div style={{ marginTop: "15px" }}>
         {places.map((place) => (
-          <li key={place.id} style={{ marginBottom: "10px" }}>
-            <strong>{place.tags?.name || "Unnamed Place"}</strong>
-            <br />
-            📍 {place.distance.toFixed(2)} km away
-          </li>
+          <PlaceCard
+            key={place.id}
+            name={place.tags?.name || "Unnamed Place"}
+            distance={place.distance}
+
+          />
         ))}
-      </ul>
+        {/* <h3>Sort by</h3>
+        <button onClick={() => setSortBy("distance")}>Nearest</button>
+        <button onClick={() => setSortBy("name")}>Name</button> */}
+
+      </div>
+
+      <button
+      
+        onClick={fetchPlaces}
+        
+        disabled={!mood || loading}
+      >
+        {loading ? "Finding places..." : "Find Places"}
+      </button>
 
 
     </main>
